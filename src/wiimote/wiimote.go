@@ -27,19 +27,33 @@ bdaddr_t *any() {
 }
 */
 import "C"
-import "time"
+//import "time"
 
 type Wiimote struct {
 	cwiid_wiimote C.cwiid_wiimote_t
 }
 
+type WiimoteState struct {
+	cwiid_state C.struct_cwiid_state
+}
 
-func Scan() {
+func (wm Wiimote) state() WiimoteState {
+  var controller_state C.struct_cwiid_state
+  res, err := C.cwiid_get_state(&wm.cwiid_wiimote, &controller_state)
+  fmt.Printf("res: %t err %d", res, err)
+  return WiimoteState{controller_state}
+}
+
+func (wm Wiimote) Button1Pressed() bool {
+	return (wm.state().cwiid_state.buttons & C.CWIID_BTN_B) == C.CWIID_BTN_B
+}
+
+
+func Scan() Wiimote {
 	//C.cwiid_set_err(C.wiierr)
 	addr := C.any()
   var controller *C.cwiid_wiimote_t
   var controller_state C.struct_cwiid_state
-	fmt.Printf("Scanning for wiimote, press buttons 1 and 2 now...\n")
 	controller, err := C.cwiid_open(addr, 0)
 	if err != nil {
 		fmt.Printf("error reported?\n")
@@ -47,12 +61,16 @@ func Scan() {
   if controller == nil {
     fmt.Printf("controller is nil, shucks\n")
   }
-  fmt.Printf("Connected, perhaps.\n")
-  state := C.uint8_t(0)
+  //state := C.uint8_t(0)
 
-  upcoming := 1
+  //upcoming := 1
   C.cwiid_get_state(controller, &controller_state)
   C.cwiid_set_rpt_mode(controller, controller_state.rpt_mode | C.CWIID_RPT_ACC | C.CWIID_RPT_BTN)
+  wiimote := Wiimote{}
+  wiimote.cwiid_wiimote = *controller
+  return wiimote
+}
+/*
   for {
     if upcoming == 1 {
       state = C.CWIID_LED1_ON
@@ -86,4 +104,4 @@ func Scan() {
     time.Sleep(2 * 1000 * time.Millisecond)
   }
 	fmt.Printf("Wiimote found but I'm exiting anyway.\n")
-}
+}*/
