@@ -14,9 +14,9 @@ viewport (vision)
 | 2 | | | | usb cable +5v |
 | 4 | | | 8 | +5v vnh2sp30 controller power |
 | 6 | | | | usb cable ground |
-| 8 | | | usb cable terminal signal |
+| 8 | | | | usb cable terminal signal |
 | 9 | | | 7 or 9 | ground for vnh |
-| 10 | | | usb cable terminal signal |
+| 10 | | | | usb cable terminal signal |
 | 11 | 17 | 0 | 4 | right wheel pwm |
 | 12 | 18 | 1 | 12 | left wheel pwm |
 | 16 | 23 | 4 | 13 | left wheel backward |
