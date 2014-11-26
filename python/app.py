@@ -3,6 +3,85 @@ import cwiid
 import sys
 import time
 
+class Wheel(object):
+
+    def __init__(self):
+        self.speed = 0
+        self.start_speed = 50
+
+    def accelerate(self):
+        if self.speed <= 0:
+            self.set_speed(self.start_speed)
+        else:
+            self.add_speed(10)
+
+    def decelerate(self):
+        if (self.speed <= 0 and self.speed > -20) or (self.speed >= 0 and self.speed < 20):
+            self.set_speed(0)
+        elif self.speed < 0:
+            self.add_speed(20)
+        else:
+            self.add_speed(-20)
+
+    def set_speed(self, new):
+        fixed = max(-100, min(new, 100))
+        self.speed = fixed
+
+    def add_speed(self, amount):
+        self.set_speed(amount + self.speed)
+
+class Car(object):
+    def __init__(self):
+        self.left = Wheel()
+        self.right = Wheel()
+
+    def accelerate(self):
+        self.left.accelerate()
+        self.right.accelerate()
+
+    def decelerate(self):
+        self.left.decelerate()
+        self.right.decelerate()
+
+    def turn_left(self):
+        print "turning left"
+        self.left.set_speed(self.right.speed - 20)
+
+    def turn_right(self):
+        print "turning right"
+        self.right.set_speed(self.left.speed - 20)
+
+    def spin_left(self):
+        self.left.set_speed(-50)
+        self.right.set_speed(50)
+
+    def spin_right(self):
+        self.right.set_speed(-50)
+        self.left.set_speed(50)
+
+    def print_state(self):
+        print "car:" + str(self.left.speed) + "    " + str(self.right.speed)
+
+car = Car()
+
+class Controller(object):
+    def __init__(self, wiimote):
+        self.wiimote = wiimote
+
+    def button_2_pressed(self):
+        return self.wiimote.state['buttons'] & cwiid.BTN_2 == cwiid.BTN_2
+
+    def left_pressed(self):
+        # no idea why cwiid.BTN_LEFT is 256 and when we press it we get 2048
+        return self.wiimote.state['buttons'] & 2048 == 2048
+
+    def right_pressed(self):
+        return self.wiimote.state['buttons'] & 1024 == 1024
+
+    def b_pressed(self):
+        #print "read:" + str(self.wiimote.state['buttons']) + " compared to " + str(cwiid.BTN_B)
+        return self.wiimote.state['buttons'] & cwiid.BTN_B == cwiid.BTN_B
+
 menu = '''1: toggle LED 1
 2: toggle LED 2
 3: toggle LED 3
@@ -25,7 +104,6 @@ def main():
   rpt_mode = 0
   rumble = 0
   mesg = False
-
   #Connect to address given on command-line, if present
   print 'Put Wiimote in discoverable mode now (press 1+2)...'
   global wiimote
@@ -33,7 +111,7 @@ def main():
     wiimote = cwiid.Wiimote(sys.argv[1])
   else:
     wiimote = cwiid.Wiimote()
-
+  controller = Controller(wiimote)
   wiimote.mesg_callback = callback
   print "Wiimote connected!"
   led ^= cwiid.LED1_ON
@@ -43,8 +121,26 @@ def main():
 
   exit = 0
   while True:
-    print_buttons(wiimote.state)
+    #print_state(wiimote.state)
+    if controller.button_2_pressed():
+        car.accelerate()
+        if controller.left_pressed():
+            car.turn_left()
+        elif controller.right_pressed():
+            car.turn_right()
+    elif controller.b_pressed():
+        if controller.left_pressed():
+            car.spin_left()
+        elif controller.right_pressed():
+            car.spin_right()
+        else:
+            car.decelerate()
+    else:
+        car.decelerate()
+    car.print_state()
     time.sleep (0.1)
+
+# nothing past this gets called, whatevs.
 
   while not exit:
     c = sys.stdin.read(1)
@@ -110,21 +206,21 @@ def print_buttons(state):
    print "Button 1 not pressed"
 
 def print_state(state):
-  print 'Report Mode:',
-  for r in ['STATUS', 'BTN', 'ACC', 'IR', 'NUNCHUK', 'CLASSIC', 'BALANCE', 'MOTIONPLUS']:
-    if state['rpt_mode'] & eval('cwiid.RPT_' + r):
-      print r,
-  print
+  #  print 'Report Mode:',
+  #for r in ['STATUS', 'BTN', 'ACC', 'IR', 'NUNCHUK', 'CLASSIC', 'BALANCE', 'MOTIONPLUS']:
+  #  if state['rpt_mode'] & eval('cwiid.RPT_' + r):
+    #      print r,
+  # print
 
-  print 'Active LEDs:',
-  for led in ['1','2','3','4']:
-    if state['led'] & eval('cwiid.LED' + led + '_ON'):
-      print led,
-  print
+  #print 'Active LEDs:',
+ # for led in ['1','2','3','4']:
+#    if state['led'] & eval('cwiid.LED' + led + '_ON'):
+  #      print led,
+  #  print
 
-  print 'Rumble:', state['rumble'] and 'On' or 'Off'
+  #print 'Rumble:', state['rumble'] and 'On' or 'Off'
 
-  print 'Battery:', int(100.0 * state['battery'] / cwiid.BATTERY_MAX)
+  #print 'Battery:', int(100.0 * state['battery'] / cwiid.BATTERY_MAX)
 
   if 'buttons' in state:
     print 'Buttons:', state['buttons']
@@ -148,7 +244,7 @@ def print_state(state):
       print
 
   if state['ext_type'] == cwiid.EXT_NONE:
-    print 'No extension'
+    pass #print 'No extension'
   elif state['ext_type'] == cwiid.EXT_UNKNOWN:
     print 'Unknown extension attached'
   elif state['ext_type'] == cwiid.EXT_NUNCHUK:
