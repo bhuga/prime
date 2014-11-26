@@ -1,0 +1,1 @@
+./pwm `cat pins/pwm-left` $1

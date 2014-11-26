@@ -1,0 +1,2 @@
+gpio write `cat pins/forward-left` 1
+gpio write `cat pins/backwards-left` 0
