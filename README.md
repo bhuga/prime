@@ -10,6 +10,7 @@ vnh2sp30 pins are counted left-to-right with the pins at the bottom of your
 viewport (vision)
 
 | pi pin | bcm gpio # | wiringpi pin | vnh2sp30 pin |  description |
+|--------|------------|--------------|--------------|--------------|
 | 2 | | | | usb cable +5v |
 | 4 | | | 8 | +5v vnh2sp30 controller power |
 | 6 | | | | usb cable ground |
