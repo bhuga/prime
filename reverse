@@ -1,0 +1,5 @@
+gpio write 4 1
+gpio write 5 0
+gpio write 13 0
+gpio write 14 1
+
