@@ -1,3 +1,3 @@
-gpio write 0 1
-gpio write 1 1
+./pwm-right 0
+./pwm-left 1 
 
