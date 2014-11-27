@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd /root/prime
+
+while :
+do
+  ./app.py
+  sleep 2
+done
