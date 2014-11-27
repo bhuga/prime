@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export PATH=$PATH:/home/pi/go/bin:/home/pi/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 cd /root/prime
 
 while :
