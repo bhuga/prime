@@ -2,13 +2,19 @@
 import cwiid
 import sys
 import time
+from os import system
 
 class Wheel(object):
 
-    def __init__(self):
+    def __init__(self, side):
         self.speed = 0
         self.start_speed = 50
+        self.side = side
 
+    def run(self, command):
+        print(command)
+        system(command)
+        
     def accelerate(self):
         if self.speed <= 0:
             self.set_speed(self.start_speed)
@@ -16,24 +22,31 @@ class Wheel(object):
             self.add_speed(10)
 
     def decelerate(self):
-        if (self.speed <= 0 and self.speed > -20) or (self.speed >= 0 and self.speed < 20):
+        if True:
+          self.set_speed(0)
+        elif (self.speed <= 0 and self.speed > -40) or (self.speed >= 0 and self.speed < 40):
             self.set_speed(0)
         elif self.speed < 0:
-            self.add_speed(20)
+            self.add_speed(40)
         else:
-            self.add_speed(-20)
+            self.add_speed(-40)
 
     def set_speed(self, new):
         fixed = max(-100, min(new, 100))
+        if fixed < 0:
+          self.run("./backwards-" + self.side)
+        else:
+          self.run("./forward-" + self.side)
         self.speed = fixed
+        self.run("./pwm-" + self.side + " " + str(abs(fixed) / 100.0))
 
     def add_speed(self, amount):
         self.set_speed(amount + self.speed)
 
 class Car(object):
     def __init__(self):
-        self.left = Wheel()
-        self.right = Wheel()
+        self.left = Wheel("left")
+        self.right = Wheel("right")
 
     def accelerate(self):
         self.left.accelerate()
@@ -43,13 +56,23 @@ class Car(object):
         self.left.decelerate()
         self.right.decelerate()
 
+    def reverse(self):
+        self.left.set_speed(-100)
+        self.right.set_speed(-100)
+
     def turn_left(self):
         print "turning left"
-        self.left.set_speed(self.right.speed - 20)
+        if self.left.speed > 0:
+          self.left.set_speed(self.right.speed - 20)
+        else:
+          self.left.set_speed(self.right.speed + 20)
 
     def turn_right(self):
         print "turning right"
-        self.right.set_speed(self.left.speed - 20)
+        if self.right.speed > 0:
+          self.right.set_speed(self.left.speed - 20)
+        else:
+          self.right.set_speed(self.left.speed + 20)
 
     def spin_left(self):
         self.left.set_speed(-50)
@@ -61,8 +84,6 @@ class Car(object):
 
     def print_state(self):
         print "car:" + str(self.left.speed) + "    " + str(self.right.speed)
-
-car = Car()
 
 class Controller(object):
     def __init__(self, wiimote):
@@ -79,8 +100,11 @@ class Controller(object):
         return self.wiimote.state['buttons'] & 1024 == 1024
 
     def b_pressed(self):
-        #print "read:" + str(self.wiimote.state['buttons']) + " compared to " + str(cwiid.BTN_B)
         return self.wiimote.state['buttons'] & cwiid.BTN_B == cwiid.BTN_B
+
+    def back_pressed(self):
+        # print "read:" + str(self.wiimote.state['buttons']) + " compared to " + str(cwiid.BTN_DOWN)
+        return self.wiimote.state['buttons'] & 256 == 256
 
 menu = '''1: toggle LED 1
 2: toggle LED 2
@@ -99,7 +123,10 @@ s: print current state
 t: toggle status reporting
 x: exit'''
 
+car = Car()
+
 def main():
+  system("./setup_pin_modes.sh")
   led = 0
   rpt_mode = 0
   rumble = 0
@@ -135,6 +162,12 @@ def main():
             car.spin_right()
         else:
             car.decelerate()
+    elif controller.back_pressed():
+      car.reverse()
+      if controller.left_pressed():
+          car.turn_left()
+      elif controller.right_pressed():
+          car.turn_right()
     else:
         car.decelerate()
     car.print_state()
