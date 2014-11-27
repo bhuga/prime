@@ -13,7 +13,9 @@ class Wheel(object):
 
     def run(self, command):
         print(command)
-        system(command)
+        res = system(command)
+        if res != 0:
+          raise NameError(command + " returned " + str(res))
         
     def accelerate(self):
         if self.speed <= 0:
