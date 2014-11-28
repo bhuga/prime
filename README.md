@@ -21,6 +21,10 @@ viewport (vision)
 | 12 | 18 | 1 | 12 | left wheel pwm |
 | 16 | 23 | 4 | 13 | left wheel backward |
 | 18 | 24 | 5 | 14 | left wheel forward |
+| 20 | | | | breadboard ground |
 | 21 | 9 | 13 | 3 | right wheel forward |
+| 22 | | | | breadboard led - booted |
 | 23 | 11 | 14 | 2 | right wheel backward |
+| 24 | | | | breadboard led - waiting for wiimote |
+| 26 | | | | breadboard led - has IP address |
  
