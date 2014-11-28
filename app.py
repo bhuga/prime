@@ -18,20 +18,11 @@ class Wheel(object):
           raise NameError(command + " returned " + str(res))
         
     def accelerate(self):
-        if self.speed <= 0:
-            self.set_speed(self.start_speed)
-        else:
-            self.add_speed(10)
+        self.set_speed(100)
 
     def decelerate(self):
         if True:
           self.set_speed(0)
-        elif (self.speed <= 0 and self.speed > -40) or (self.speed >= 0 and self.speed < 40):
-            self.set_speed(0)
-        elif self.speed < 0:
-            self.add_speed(40)
-        else:
-            self.add_speed(-40)
 
     def set_speed(self, new):
         fixed = max(-100, min(new, 100))
@@ -49,6 +40,7 @@ class Car(object):
     def __init__(self):
         self.left = Wheel("left")
         self.right = Wheel("right")
+        self.turn_speed = 30
 
     def accelerate(self):
         self.left.accelerate()
@@ -65,24 +57,24 @@ class Car(object):
     def turn_left(self):
         print "turning left"
         if self.left.speed > 0:
-          self.left.set_speed(self.right.speed - 20)
+          self.left.set_speed(self.right.speed - self.turn_speed)
         else:
-          self.left.set_speed(self.right.speed + 20)
+          self.left.set_speed(self.right.speed + self.turn_speed)
 
     def turn_right(self):
         print "turning right"
         if self.right.speed > 0:
-          self.right.set_speed(self.left.speed - 20)
+          self.right.set_speed(self.left.speed - self.turn_speed)
         else:
-          self.right.set_speed(self.left.speed + 20)
+          self.right.set_speed(self.left.speed + self.turn_speed)
 
     def spin_left(self):
-        self.left.set_speed(-50)
-        self.right.set_speed(50)
+        self.left.set_speed(-100)
+        self.right.set_speed(100)
 
     def spin_right(self):
-        self.right.set_speed(-50)
-        self.left.set_speed(50)
+        self.right.set_speed(-100)
+        self.left.set_speed(100)
 
     def print_state(self):
         print "car:" + str(self.left.speed) + "    " + str(self.right.speed)
