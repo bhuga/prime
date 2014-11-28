@@ -6,10 +6,11 @@ from os import system
 
 class Wheel(object):
 
-    def __init__(self, side):
+    def __init__(self, side, handicap):
         self.speed = 0
         self.start_speed = 50
         self.side = side
+        self.handicap = handicap
 
     def run(self, command):
         print(command)
@@ -31,15 +32,15 @@ class Wheel(object):
         else:
           self.run("./forward-" + self.side)
         self.speed = fixed
-        self.run("./pwm-" + self.side + " " + str(abs(fixed) / 100.0))
+        self.run("./pwm-" + self.side + " " + str(self.handicap * (abs(fixed) / 100.0)))
 
     def add_speed(self, amount):
         self.set_speed(amount + self.speed)
 
 class Car(object):
     def __init__(self):
-        self.left = Wheel("left")
-        self.right = Wheel("right")
+        self.left = Wheel("left", 0.80)
+        self.right = Wheel("right", 1.0)
         self.turn_speed = 30
 
     def accelerate(self):
