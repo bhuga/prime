@@ -56,17 +56,21 @@ class Car(object):
 
     def turn_left(self):
         print "turning left"
-        if self.left.speed > 0:
-          self.left.set_speed(self.right.speed - self.turn_speed)
-        else:
-          self.left.set_speed(self.right.speed + self.turn_speed)
+        self.left.set_speed(50)
+        self.right.set_speed(100)
 
     def turn_right(self):
         print "turning right"
-        if self.right.speed > 0:
-          self.right.set_speed(self.left.speed - self.turn_speed)
-        else:
-          self.right.set_speed(self.left.speed + self.turn_speed)
+        self.right.set_speed(50)
+        self.left.set_speed(100)
+
+    def turn_left_backwards(self):
+        self.left.set_speed(-50)
+        self.right.set_speed(-100)
+
+    def turn_right_backwards(self):
+        self.right.set_speed(-50)
+        self.left.set_speed(-100)
 
     def spin_left(self):
         self.left.set_speed(-100)
@@ -144,11 +148,13 @@ def main():
   while True:
     #print_state(wiimote.state)
     if controller.button_2_pressed():
-        car.accelerate()
         if controller.left_pressed():
-            car.turn_left()
+          car.turn_left()
         elif controller.right_pressed():
-            car.turn_right()
+          car.turn_right()
+        else:
+          car.accelerate()
+
     elif controller.b_pressed():
         if controller.left_pressed():
             car.spin_left()
@@ -156,12 +162,15 @@ def main():
             car.spin_right()
         else:
             car.decelerate()
+
     elif controller.back_pressed():
-      car.reverse()
       if controller.left_pressed():
-          car.turn_left()
+        car.turn_left_backwards()
       elif controller.right_pressed():
-          car.turn_right()
+        car.turn_right_backwards()
+      else:
+        car.reverse()
+
     else:
         car.decelerate()
     car.print_state()
