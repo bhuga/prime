@@ -13,7 +13,6 @@ class Wheel(object):
         self.handicap = handicap
 
     def run(self, command):
-        print(command)
         res = system(command)
         if res != 0:
           raise NameError(command + " returned " + str(res))
@@ -41,7 +40,7 @@ class Car(object):
     def __init__(self):
         self.left = Wheel("left", 0.80)
         self.right = Wheel("right", 1.0)
-        self.turn_speed = 30
+        self.turn_speed = 50
 
     def accelerate(self):
         self.left.accelerate()

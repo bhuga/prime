@@ -1,12 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 export PATH=$PATH:/home/pi/go/bin:/home/pi/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 cd /root/prime
 
-while :
+while : 
 do
-  ./waiting_on
-  ./app.py
-  ./waiting_off
-  sleep 2
+  ./check_ip_address
+  sleep 5
 done
+

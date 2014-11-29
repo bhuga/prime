@@ -1,0 +1,6 @@
+./ip_address_off
+
+ifconfig wlan0 | grep -q inet
+if [ $? -eq 0 ] ; then
+	./ip_address_on
+fi 

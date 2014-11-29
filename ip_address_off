@@ -1,0 +1,1 @@
+gpio write `cat pins/ip_address` 0
